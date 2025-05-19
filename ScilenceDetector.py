@@ -15,9 +15,6 @@ def get_audio_device_by_name():
         print(i, p.get_device_info_by_index(i)['name'])
 
 # Make all your configurations here
-# 
-#
-#
 CHUNK = 3200 # Sets buffe size
 BIT_DEPTH = pyaudio.paInt16
 CHANNELS = 1 # Mono or Stereo 1/2
