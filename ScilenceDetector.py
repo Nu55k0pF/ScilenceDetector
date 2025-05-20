@@ -6,9 +6,11 @@
 # 24 bit    = 3
 # 32 bit    = 4
 #TODO: Build PortAudio with ASIO Support and make it install with requirements
+#TODO: Implement sending OSC comands 
 
 import pyaudio
 import audioop
+from pythonosc import udp_client
 
 def get_audio_device_by_name():
     for i in range(0, p.get_device_count()):    
@@ -19,7 +21,11 @@ CHUNK = 3200 # Sets buffe size
 BIT_DEPTH = pyaudio.paInt16
 CHANNELS = 1 # Mono or Stereo 1/2
 SAMPLING_RATE = 44100
+OSC_SERVER_IP = "127.0.0.1" # IP Adress of OSC server to send messages to
+OSC_SERVER_PORT = 5005
+OSC_VALUE = 1
 
+osc_client = udp_client.SimpleUDPClient(address=OSC_SERVER_IP, port=OSC_SERVER_PORT) # Initialize the osc_clienat
 p = pyaudio.PyAudio() # Create an Interface to PortAudio
 
 get_audio_device_by_name()
@@ -62,6 +68,7 @@ while listen:
             continue
         else:
             print("Scilence Detected!!!!")
+            osc_client.send_message("/filter", value=OSC_VALUE) #Send a OSC Message to some other hardware or module
             listen = False
 
 # Stop and Close the audiostream
