@@ -8,7 +8,6 @@
 #TODO: Build PortAudio with ASIO Support and make it install with requirements
 
 import pyaudio
-import struct
 import audioop
 
 def get_audio_device_by_name():
