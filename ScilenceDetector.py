@@ -1,4 +1,5 @@
-# Reference: https://kevinponce.com/blog/python/record-audio-on-detection/
+# Reference Pyaudio: https://kevinponce.com/blog/python/record-audio-on-detection/
+# Reference pythonosc docs: https://python-osc.readthedocs.io/en/latest/client.html
 # audioop is deprecated in 3.13 use auidoop-lts instead
 # audioop width 
 # 8 bit     = 1
@@ -25,8 +26,10 @@ OSC_SERVER_PORT = 5005
 OSC_ADRESS = "/filter" # Enter OSC Adress to send message to
 OSC_VALUE = 1 # Enter the desired value for your osc action
 
-osc_client = udp_client.SimpleUDPClient(address=OSC_SERVER_IP, port=OSC_SERVER_PORT) # Initialize the osc_clienat
-p = pyaudio.PyAudio() # Create an Interface to PortAudio
+# Initialize the osc_clienat
+osc_client = udp_client.SimpleUDPClient(address=OSC_SERVER_IP, port=OSC_SERVER_PORT) 
+# Create an Interface to PortAudio
+p = pyaudio.PyAudio() 
 
 get_audio_device_by_name()
 print("Select input device by index:\n")
@@ -42,11 +45,15 @@ stream = p.open(
     input_device_index=device_index # here you have to set the input device to monitor use p.get_device_info_by_index() to list all available
 )
 
-frames = [] # Initialize an arry to store data in
-seconds = 6 # how long to record
-last_rms = [] # stors the last x rms values
+# Initialize an arry to store data in
+frames = [] 
+# how long to record
+seconds = 6 
+# stors the last x rms values
+last_rms = [] 
 threshold = 100
-time = 40 # at 44.1 kHz and 3200 samples in the buffer you have about 14 chunks per second, so if you want a detection time of 2 seconds 30 is about the right value here. 3 sek ~ 42
+# at 44.1 kHz and 3200 samples in the buffer you have about 14 chunks per second, so if you want a detection time of 2 seconds 30 is about the right value here. 3 sek ~ 42
+time = 40 
 listen = True
 
 # for i in range(0, int(SAMPLING_RATE/CHUNK * seconds)):
@@ -68,6 +75,7 @@ while listen:
             continue
         else:
             print("Scilence Detected!!!!")
+            print("Sending {} to {}:{}{}".format(OSC_VALUE, OSC_SERVER_IP, OSC_SERVER_PORT, OSC_ADRESS))
             osc_client.send_message(OSC_ADRESS, value=OSC_VALUE) #Send a OSC Message to some other hardware or module
             listen = False
 
