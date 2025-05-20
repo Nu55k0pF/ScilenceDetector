@@ -54,7 +54,10 @@ def detect_scilence(stream):
                 send_osc_message()
                 listen = False
 
-def reaper_handler(address, *args):
+def handler(address, *args):
+    """This is an example function. It detects the Reaper OSC message for toggle play and starts listening. 
+    This needs to be adapted for other aplications
+    """
     print("{} - {}".format(address, args))
     p = pyaudio.PyAudio()
     stream = p.open(
@@ -72,7 +75,7 @@ def reaper_handler(address, *args):
 
 dispatcher = Dispatcher()
 # dispatcher.map("/something/*", print_handler)
-dispatcher.map("/play", reaper_handler)
+dispatcher.map("/play", handler)
 # dispatcher.set_default_handler(reaper_handler)
 
 ip = "127.0.0.1"
