@@ -15,7 +15,7 @@ SAMPLING_RATE: int = 44100
 OSC_SERVER_IP: str = "127.0.0.1" # IP Adress of OSC server to send messages to
 OSC_SERVER_PORT: int = 8000
 OSC_ADRESS: str = "t/stop" # Enter OSC Adress to send message to
-OSC_VALUE: str =  "1"# Enter the desired value for your osc action
+OSC_VALUE: str =  "1" # Enter the desired value for your osc action
 HOST_IP: str = "127.0.0.1"
 HOST_PORT: int = 9000
 
