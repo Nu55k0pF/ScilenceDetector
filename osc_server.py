@@ -1,3 +1,6 @@
+# Referemce https://python-osc.readthedocs.io/en/latest/server.html#blocking-server
+# This is not written by me and is only used for testing while developing the scilence detector
+
 from pythonosc.dispatcher import Dispatcher
 from pythonosc.osc_server import BlockingOSCUDPServer
 
