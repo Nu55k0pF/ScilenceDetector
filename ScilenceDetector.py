@@ -22,8 +22,8 @@ BIT_DEPTH = pyaudio.paInt16
 CHANNELS = 1 # Mono or Stereo 1/2
 SAMPLING_RATE = 44100
 OSC_SERVER_IP = "127.0.0.1" # IP Adress of OSC server to send messages to
-OSC_SERVER_PORT = 5005
-OSC_ADRESS = "/filter" # Enter OSC Adress to send message to
+OSC_SERVER_PORT = 8000
+OSC_ADRESS = "t/play" # Enter OSC Adress to send message to
 OSC_VALUE = 1 # Enter the desired value for your osc action
 
 # Initialize the osc_clienat
