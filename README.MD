@@ -1,6 +1,11 @@
 # Scilence Detector
 Scilence Detector is a little script to monitor some input and send OSC messages on detecting scilence
 
+# OSC Server
+Contains the main functionality. The program is intended to be used to monitor a playback and send an OSC message to do emergency actions e.g. automatic failover to a different playback source. The program contains an example handler that starts listening if the Reaper Playback toggel is recived as OSC message. If scilence is detected, playback is stopped.
+
+ATTENTION this doeas currently not work with ASIO because I couldn`t get PortAudio/PyAudio to use ASIO. 
+
 # For ASIO Support
 for pyaudio to support ASIO you need to compile PortAudio with ASIO support enabled 
 
