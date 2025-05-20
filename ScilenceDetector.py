@@ -5,6 +5,7 @@
 # 16 bit    = 2
 # 24 bit    = 3
 # 32 bit    = 4
+#TODO: Build PortAudio with ASIO Support and make it install with requirements
 
 import pyaudio
 import struct
