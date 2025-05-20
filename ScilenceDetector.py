@@ -59,31 +59,31 @@ OSC_SERVER_PORT = 8000
 OSC_ADRESS = "s/marker/1/name" # Enter OSC Adress to send message to
 OSC_VALUE =  "Scilence detected"# Enter the desired value for your osc action
 
-# Initialize the osc_clienat
-osc_client = udp_client.SimpleUDPClient(address=OSC_SERVER_IP, port=OSC_SERVER_PORT) 
-# Create an Interface to PortAudio
-p = pyaudio.PyAudio() 
+if __name__ == "__main__":
+    # Initialize the osc_clienat
+    osc_client = udp_client.SimpleUDPClient(address=OSC_SERVER_IP, port=OSC_SERVER_PORT) 
+    # Create an Interface to PortAudio
+    p = pyaudio.PyAudio() 
 
-get_audio_device_by_name()
-print("Select input device by index:\n")
+    get_audio_device_by_name()
+    print("Select input device by index:\n")
 
-device_index = int(input())
+    device_index = int(input())
 
-stream = p.open(
-    format=BIT_DEPTH,
-    channels=CHANNELS,
-    rate=SAMPLING_RATE,
-    input=True,
-    frames_per_buffer=CHUNK,
-    input_device_index=device_index # here you have to set the input device to monitor use p.get_device_info_by_index() to list all available
-)
+    stream = p.open(
+        format=BIT_DEPTH,
+        channels=CHANNELS,
+        rate=SAMPLING_RATE,
+        input=True,
+        frames_per_buffer=CHUNK,
+        input_device_index=device_index # here you have to set the input device to monitor use p.get_device_info_by_index() to list all available
+    )
 
+    # for i in range(0, int(SAMPLING_RATE/CHUNK * seconds)):
+    detect_scilence(stream)
 
-# for i in range(0, int(SAMPLING_RATE/CHUNK * seconds)):
-detect_scilence(stream)
-
-# Stop and Close the audiostream
-stream.start_stream()
-stream.close()
-# Terminate PortAudio interface
-p.terminate()
+    # Stop and Close the audiostream
+    stream.start_stream()
+    stream.close()
+    # Terminate PortAudio interface
+    p.terminate()

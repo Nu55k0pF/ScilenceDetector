@@ -20,7 +20,7 @@ OSC_VALUE =  "1"# Enter the desired value for your osc action
 def send_osc_message():
     """Use this to configure the action to take when detecitng scilence"""
     osc_client = udp_client.SimpleUDPClient(address=OSC_SERVER_IP, port=OSC_SERVER_PORT) 
-    print("Sending {} to {}:{}{}".format(OSC_VALUE, OSC_SERVER_IP, OSC_SERVER_PORT, OSC_ADRESS))
+    print("Sending {} '{}' to {}:{}".format(OSC_ADRESS, OSC_VALUE, OSC_SERVER_IP, OSC_SERVER_PORT ))
     osc_client.send_message(OSC_ADRESS, value=OSC_VALUE) #Send a OSC Message to some other hardware or module
 
 def detect_scilence(stream):
@@ -58,7 +58,7 @@ def handler(address, *args):
     """This is an example function. It detects the Reaper OSC message for toggle play and starts listening. 
     This needs to be adapted for other aplications
     """
-    print("{} - {}".format(address, args))
+    print("Recived {} {}".format(address, args))
     p = pyaudio.PyAudio()
     stream = p.open(
         format=BIT_DEPTH,
