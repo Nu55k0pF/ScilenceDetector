@@ -16,9 +16,9 @@ import sounddevice as sd
 
 # Make all your configurations here
 CHUNK: int = 3200
-CHANNELS = [11,12] # Focusrite 18i8 loopback Channels 11/12
+CHANNELS = 1 # Focusrite 18i8 loopback Channels 11/12
 SAMPLING_RATE: int = 44100
-DEVICE = 20
+DEVICE = 3
 OSC_SERVER_IP: str = "127.0.0.1" # IP Adress of OSC server to send messages to
 OSC_SERVER_PORT: int = 8000
 OSC_ADRESS: str = "t/stop" # Enter OSC Adress to send message to
@@ -76,6 +76,7 @@ def detect_scilence():
                 continue
             else:
                 print("Scilence Detected!!!!")
+                send_osc_message()
                 listen = False
 
 
@@ -85,21 +86,17 @@ def handler(address: str, *args: list[str]):
     This needs to be adapted for other aplications
     """
     print("Recived {} {}".format(address, args))
-    stream = sd.InputStream(samplerate=SAMPLING_RATE, channels=CHANNELS,
-        blocksize=CHUNK, device=20, callback=callback)
     if args [-1] == 1:
+        stream = sd.InputStream(samplerate=SAMPLING_RATE, channels=CHANNELS,
+            blocksize=CHUNK, device=20, callback=callback)
         with stream:
-            while True:
-                detect_scilence()
-                #TODO: Make it so it stops when detecting scilence!
+            detect_scilence()
     else:
         return
 
 
 dispatcher = Dispatcher()
-# dispatcher.map("/something/*", print_handler)
 dispatcher.map("/play", handler)
-# dispatcher.set_default_handler(reaper_handler)
 
-server = BlockingOSCUDPServer( (HOST_IP, HOST_PORT), dispatcher)
+server = BlockingOSCUDPServer((HOST_IP, HOST_PORT), dispatcher)
 server.serve_forever()  # Blocks forever
