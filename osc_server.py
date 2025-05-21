@@ -25,7 +25,7 @@ def send_osc_message() -> None:
     print("Sending {} '{}' to {}:{}".format(OSC_ADRESS, OSC_VALUE, OSC_SERVER_IP, OSC_SERVER_PORT))
     osc_client.send_message(OSC_ADRESS, value=OSC_VALUE) #Send a OSC Message to some other hardware or module
 
-def detect_scilence(stream: PyAudio.Stream) -> None:
+def detect_scilence(stream) -> None:
     # Initialize an arry to store data in
     frames: list = [] 
     # stors the last x rms values
