@@ -20,16 +20,11 @@ def calculate_dbfs(data) -> float:
     loudness_db = 20 * np.log10(rms)
     return loudness_db
 
-# Define the callback function for real-time audio processing
-def audio_callback(indata, frames, time, status):
-    loudness_db = calculate_dbfs(indata)
-    # Print the loudness in decibels
-    print("Loudness (dB):", loudness_db)
-
 def callback(indata, frames, time, status):
     """This is called (from a separate thread) for each audio block."""
     if status:
         print(status, file=sys.stderr)
+    # put indata in the cue to be used in the detect_scilence function
     q.put(indata.copy())
 
 def detect_scilence():
@@ -48,7 +43,7 @@ def detect_scilence():
 
         if len(last_messurment) < time:
             last_messurment.append(dbfs)
-
+            print(dbfs)
         else:
             last_messurment.pop(0)
             last_messurment.append(dbfs)
@@ -71,12 +66,3 @@ stream = sd.InputStream(samplerate=44100, channels=CHANNELS,
 with stream:
     while True:
         detect_scilence()
-
-# stream.start()
-
-# while True:
-#     # detect_scilence(stream.read(CHUNK))
-#     pass
-
-# stream.stop()
-# stream.close()
