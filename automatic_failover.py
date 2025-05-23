@@ -1,4 +1,4 @@
-# Referemce https://python-osc.readthedocs.io/en/latest/server.html#blocking-server
+# Version: 0.1.1
 
 from pythonosc.dispatcher import Dispatcher
 from pythonosc.osc_server import BlockingOSCUDPServer
@@ -51,7 +51,7 @@ Don't mess with anything after the config section if you just want to use the pr
 
 # Set the default audio device and samplerate if DEFAULT is True
 def set_audio_defaults():
-    """Sets some default values for audio device configuration."""
+    """ Sets some default values for audio device configuration."""
     global DEVICE, SAMPEL_RATE, CHANNELS
 
     default_input = sd.default.device[0]
@@ -72,7 +72,7 @@ detection_thread = None  # Globaler Thread-Handle
 
 
 def send_osc_message() -> None:
-    """Creats a udp client and sends a OSC message and prints it to console."""
+    """ Creats a udp client and sends a OSC message and prints it to console."""
     osc_client = udp_client.SimpleUDPClient(address=REMOTE_OSC_IP, port=REMOTE_OSC_PORT) 
     print("Sending {} '{}' to {}:{}".format(OSC_ADRESS, OSC_VALUE, REMOTE_OSC_IP, REMOTE_OSC_PORT))
     osc_client.send_message(OSC_ADRESS, value=OSC_VALUE) # Send a OSC Message to some other hardware or module
@@ -85,7 +85,13 @@ def calculate_dbfs(data) -> float:
 
 
 def callback(indata, frames, time, status) -> None:
-    """This is called (from a separate thread) for each audio block."""
+    """ This is called (from a separate thread) for each audio block.
+
+    indata: the audio data
+    frames: the number of frames in the block
+    time: the time of the block
+    status: any errors that occurred
+    """
     if status:
         print(status, file=sys.stderr)
     # Put indata in the cue to be used in the detect_scilence function
@@ -93,8 +99,9 @@ def callback(indata, frames, time, status) -> None:
 
 
 def detect_scilence() -> None:
-    """gets audio frame data from que and calculates dbfs audio level.
-    If level is under the configured threshold, call send_osc_message"""
+    """ Gets audio frame data from que and calculates dbfs audio level.
+    If level is under the configured threshold, call send_osc_message
+    """
     last_messurment: list = [] 
     threshold = THRESHOLD
     time: float = SCILENCE_DETECT_TIME 
@@ -120,9 +127,9 @@ def detect_scilence() -> None:
 
 def handler(address: str, *args: list[str]) -> None:
     """ Handles incoming OSC messages. 
+
     This function is called when an OSC message is received.
     It checks the address and arguments of the message and takes appropriate action.
-
     address: OSC address like /play
     *args: OSC values 1 or 0
     """
@@ -135,7 +142,7 @@ def handler(address: str, *args: list[str]) -> None:
 
 
 def start_detection() -> None:
-    """Starts the silence detection thread if it is not already running.
+    """ Starts the silence detection thread if it is not already running.
 
     This function checks if the global detection_thread is either None or not alive.
     If so, it clears the stop_event and starts a new daemon thread that runs the
@@ -149,12 +156,25 @@ def start_detection() -> None:
 
 
 def scilence_detection_thread() -> None:
+    """ Runs the silence detection logic in a separate thread.
+
+    Opens an audio input stream with the configured parameters and continuously
+    processes incoming audio data using the callback function. The actual silence
+    detection is performed by calling detect_scilence(). This function is intended
+    to be run as a daemon thread.
+    """
     with sd.InputStream(samplerate=SAMPEL_RATE, channels=CHANNELS,
                         blocksize=CHUNK, device=DEVICE, callback=callback):
         detect_scilence()
 
 
 def osc_server_thread() -> None:
+    """Starts the OSC server in a separate thread.
+
+    Sets up an OSC dispatcher to handle incoming OSC messages and starts a blocking UDP server
+    that listens for messages on the configured local IP and port. The server runs indefinitely,
+    processing incoming OSC messages using the mapped handler functions.
+    """
     dispatcher = Dispatcher()
     dispatcher.map("/play", handler)
     # Optional: dispatcher.map("/stop", handler)
@@ -165,6 +185,6 @@ def osc_server_thread() -> None:
 if __name__ == "__main__":
     t = threading.Thread(target=osc_server_thread, daemon=True)
     t.start()
-    print("OSC Server läuft. Warte auf /play ...")
+    print("OSC Server is running. Awaiting /play ...")
     while True:
         time.sleep(1)
