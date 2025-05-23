@@ -33,7 +33,7 @@ SAMPEL_RATE: int = 44100
 # Network and OSC config
 REMOTE_OSC_IP: str = "10.10.0.83" # IP Adress of OSC server to send messages to
 REMOTE_OSC_PORT: int = 11000
-LOCAL_OSC_IP: str = "10.10.0.83"
+LOCAL_OSC_IP: str = "127.0.0.1"
 LOCAL_OSC_PORT: int = 11001
 
 # Scilence detection config
@@ -102,27 +102,22 @@ def detect_scilence() -> None:
     """ Gets audio frame data from que and calculates dbfs audio level.
     If level is under the configured threshold, call send_osc_message
     """
-    last_messurment: list = [] 
+    last_measurements = []
     threshold = THRESHOLD
-    time: float = SCILENCE_DETECT_TIME 
+    window_size = SCILENCE_DETECT_TIME
     stop_event.clear()
     while not stop_event.is_set():
         frame = q.get()
-        dbfs: float = calculate_dbfs(frame)
-        if len(last_messurment) < time:
-            last_messurment.append(dbfs)
-            print(dbfs)
-        else:
-            last_messurment.pop(0)
-            last_messurment.append(dbfs)
-            avarage = sum(last_messurment)/len(last_messurment)
-            if avarage > threshold:
-                print(dbfs)
-                continue
-            else: 
-                print("Scilence Detected!!!!")
-                send_osc_message()
-                break
+        dbfs = calculate_dbfs(frame)
+        last_measurements.append(dbfs)
+        if len(last_measurements) > window_size:
+            last_measurements.pop(0)
+        avg = sum(last_measurements) / len(last_measurements)
+        print(dbfs)
+        if len(last_measurements) == window_size and avg <= threshold:
+            print("Scilence Detected!!!!")
+            send_osc_message()
+            break
 
 
 def handler(address: str, *args: list[str]) -> None:
