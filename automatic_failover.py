@@ -23,16 +23,16 @@ set DEFAULT = True
 
 # Audio device config
 DEFAULT = False
+DEVICE = 0 # 3 for Focusrite
 CHUNK: int = 3200
-CHANNELS = [11, 12] # Focusrite 18i8 loopback Channels [11, 12]
+CHANNELS = [1, 2] # Focusrite 18i8 loopback Channels [11, 12]
 SAMPEL_RATE: int = 44100
-DEVICE = 3 # Enter 'None' here if you just want to use your default audio device 
 
 # Network and OSC config
-REMOTE_OSC_IP: str = "192.168.1.4" # IP Adress of OSC server to send messages to
-REMOTE_OSC_PORT: int = 11001
-LOCAL_OSC_IP: str = "127.0.0.1"
-LOCAL_OSC_PORT: int = 9000
+REMOTE_OSC_IP: str = "10.10.0.110" # IP Adress of OSC server to send messages to
+REMOTE_OSC_PORT: int = 11000
+LOCAL_OSC_IP: str = "10.10.0.83"
+LOCAL_OSC_PORT: int = 11001
 
 # Scilence detection config
 SCILENCE_DETECT_LEVEL: float = -50
@@ -48,9 +48,11 @@ OSC_VALUE: str =  "1" # Enter the desired value for your osc action
 Don't mess with anything after the config section if you just want to use the program 'as is'.
 """
 
-if DEFAULT:
-    DEVICE = sd.default.device
-    SAMPEL_RATE = sd.query_devices(DEVICE, 'input')['default_samplerate']
+#TODO Build a nice function to set everythting to default for the sounddevice config
+# if DEFAULT:
+#     DEVICE = sd.default.device
+#     SAMPEL_RATE = sd.query_devices(DEVICE, 'input')['default_samplerate']
+#     CHANNELS = sd.default.channels
 
 q = queue.Queue()
 
@@ -116,7 +118,7 @@ def handler(address: str, *args: list[str]):
     print("Recived {} {}".format(address, args))
     if args [-1] == 1:
         stream = sd.InputStream(samplerate=SAMPEL_RATE, channels=CHANNELS,
-            blocksize=CHUNK, device=20, callback=callback)
+            blocksize=CHUNK, device=DEVICE, callback=callback)
         with stream:
             detect_scilence()
     else:
