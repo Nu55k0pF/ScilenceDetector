@@ -23,10 +23,10 @@ set DEFAULT = True
 """
 
 # Audio device config
-DEFAULT = False
-DEVICE = 2 # 3 for Focusrite
+DEFAULT = True
+DEVICE = 3 # 3 for Focusrite
 CHUNK: int = 3200
-CHANNELS = [1, 2] # Focusrite 18i8 loopback Channels [11, 12]
+CHANNELS = [11, 12] # Focusrite 18i8 loopback Channels [11, 12]
 SAMPEL_RATE: int = 44100
 
 # Network and OSC config
@@ -36,10 +36,9 @@ LOCAL_OSC_IP: str = "10.10.0.83"
 LOCAL_OSC_PORT: int = 11001
 
 # Scilence detection config
-SCILENCE_DETECT_LEVEL: float = -50
 SECONDS: int = 3 # This number reperesents the time in seconds
 SCILENCE_DETECT_TIME: int = round(SAMPEL_RATE/CHUNK * SECONDS)
-THRESHOLD: float = -50 # In DBFS
+THRESHOLD: float = -30 # In DBFS
 
 # Failover OSC acction config
 OSC_ADRESS: str = "t/stop" # Enter OSC Adress to send message to
@@ -49,15 +48,27 @@ OSC_VALUE: str =  "1" # Enter the desired value for your osc action
 Don't mess with anything after the config section if you just want to use the program 'as is'.
 """
 
-#TODO Build a nice function to set everythting to default for the sounddevice config
-# if DEFAULT:
-#     DEVICE = sd.default.device
-#     SAMPEL_RATE = sd.query_devices(DEVICE, 'input')['default_samplerate']
-#     CHANNELS = sd.default.channels
+# Set the default audio device and samplerate if DEFAULT is True
+def set_audio_defaults():
+    global DEVICE, SAMPEL_RATE, CHANNELS
+    # Hole das Standard-Input-Device
+    default_input = sd.default.device[0]
+    if default_input is None or default_input < 0:
+        default_input = sd.query_devices(kind='input')['index']
+    DEVICE = default_input
+    # Hole die Standard-Samplerate
+    SAMPEL_RATE = int(sd.query_devices(DEVICE, 'input')['default_samplerate'])
+    # Hole die Standard-Anzahl der Kanäle (als Integer!)
+    CHANNELS = sd.query_devices(DEVICE, 'input')['max_input_channels']
 
+if DEFAULT:
+    set_audio_defaults()
+
+# Start of the function defenitions
 q = queue.Queue()
 stop_event = threading.Event()
 detection_thread = None  # Globaler Thread-Handle
+
 
 def send_osc_message() -> None:
     """Use this to configure the action to take when detecitng scilence"""
