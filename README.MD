@@ -2,31 +2,32 @@
 ## Overview
 This project aims to develope a solution for automatic failover if playback on an Ableton live playback dops out. To achive this the OSC Server waits for a playback comand and then starts monitoring an audio impot. When scilence is detected an OSC comand is send to a mixing console or other hardware, to switch inputs to a backup system
 
-## Setup and configuration
-
-work in progress
-
 ## Scilence Detector
+
 Scilence Detector is a little script to monitor some input and send OSC messages on detecting scilence
 
-## OSC Server
-Contains the main functionality. The program is intended to be used to monitor a playback and send an OSC message to do emergency actions e.g. automatic failover to a different playback source. The program contains an example handler that starts listening if the Reaper Playback toggel is recived as OSC message. If scilence is detected, playback is stopped.
+## OSC Monitor
 
-ATTENTION if you install the dependencys regularly there will be no ASIO support
+Is a little OSC server for testing porposes. It recives OSC messages and prints them to console
 
-# Installation Guide for PyAudio with ASIO Support
+## OSC Monitor
 
-The default PyAudio you can install with 
+Is a littel commandline tool to send OSC messages to any device.
 
-    pip install PyAudio
+## automatic failover
 
-does not come with ASIO support. That is becaus the PortAudio Build linked in PyAudio was not compiled with ASIO Support. However you could compile PortAudio yourself like described here
-https://portaudio.com/docs/v19-doxydocs/compile_windows.html
+This program is the main functionality. It is intendet to be used in conjunction with a DAW that is able to send and recive OSC messages. This is all setup for Ableton but could also be done with Reaper
 
-Or you can find a PyAudio .whl that was compiled with ASIO support like the one in this repository. If you are brave enough you can download it and install it like so:
+# Setup and installation
 
-    pip install PyAudio-0.2.11-cp311-cp311-win_amd64.whl
+Download the repo and install a all dependencys
 
-Aperently Christoph Gohlke hosts pyaudio .whl with ASIO support. But as of 21.05.2025 I could not find any PyAudio .whl on his site:
+    git clone https://github.com/Nu55k0pF/ScilenceDetector.git
+    python -m venv myvenv
+    pip install -r requirements.txt
 
-https://github.com/cgohlke/win_arm64-wheels?tab=readme-ov-file
+Configure the server to your liking and start the automatic_failover.py
+
+# To does
+
+Add a helper script to choos your audio settings
