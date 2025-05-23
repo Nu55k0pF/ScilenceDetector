@@ -30,7 +30,7 @@ CHANNELS = [11, 12] # Focusrite 18i8 loopback Channels [11, 12]
 SAMPEL_RATE: int = 44100
 
 # Network and OSC config
-REMOTE_OSC_IP: str = "10.10.0.110" # IP Adress of OSC server to send messages to
+REMOTE_OSC_IP: str = "10.10.0.83" # IP Adress of OSC server to send messages to
 REMOTE_OSC_PORT: int = 11000
 LOCAL_OSC_IP: str = "10.10.0.83"
 LOCAL_OSC_PORT: int = 11001
@@ -38,10 +38,10 @@ LOCAL_OSC_PORT: int = 11001
 # Scilence detection config
 SECONDS: int = 3 # This number reperesents the time in seconds
 SCILENCE_DETECT_TIME: int = round(SAMPEL_RATE/CHUNK * SECONDS)
-THRESHOLD: float = -30 # In DBFS
+THRESHOLD: float = -40 # In DBFS
 
 # Failover OSC acction config
-OSC_ADRESS: str = "t/stop" # Enter OSC Adress to send message to
+OSC_ADRESS: str = "/track/1/mute/toggle" # Enter OSC Adress to send message to
 OSC_VALUE: str =  "1" # Enter the desired value for your osc action
 
 """ End of config block
