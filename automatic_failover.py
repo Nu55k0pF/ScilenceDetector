@@ -38,7 +38,7 @@ LOCAL_OSC_PORT: int = 11001
 SCILENCE_DETECT_LEVEL: float = -50
 SECONDS: int = 3 # This number reperesents the time in seconds
 SCILENCE_DETECT_TIME: int = round(SAMPEL_RATE/CHUNK * SECONDS)
-THRESHOLD: float = -50 # In DBFS
+THRESHOLD: float = -500 # In DBFS
 
 # Failover OSC acction config
 OSC_ADRESS: str = "t/stop" # Enter OSC Adress to send message to
@@ -77,7 +77,7 @@ def callback(indata, frames, time, status):
     q.put(indata.copy())
 
 
-def detect_scilence(args: list[str]) -> None:
+def detect_scilence() -> None:
     # Stors the last x dbfs values
     last_messurment: list = [] 
     threshold = THRESHOLD
@@ -87,7 +87,6 @@ def detect_scilence(args: list[str]) -> None:
     while listen:
         frame = q.get()
         dbfs = calculate_dbfs(frame)
-
         if len(last_messurment) < time:
             last_messurment.append(dbfs)
             print(dbfs)
@@ -121,7 +120,7 @@ def handler(address: str, *args: list[str]):
         stream = sd.InputStream(samplerate=SAMPEL_RATE, channels=CHANNELS,
             blocksize=CHUNK, device=DEVICE, callback=callback)
         with stream:
-            detect_scilence(args)
+            detect_scilence()
     else:
         return
 
