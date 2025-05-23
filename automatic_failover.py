@@ -23,7 +23,7 @@ set DEFAULT = True
 
 # Audio device config
 DEFAULT = False
-DEVICE = 0 # 3 for Focusrite
+DEVICE = 2 # 3 for Focusrite
 CHUNK: int = 3200
 CHANNELS = [1, 2] # Focusrite 18i8 loopback Channels [11, 12]
 SAMPEL_RATE: int = 44100
@@ -77,12 +77,13 @@ def callback(indata, frames, time, status):
     q.put(indata.copy())
 
 
-def detect_scilence():
+def detect_scilence(args: list[str]) -> None:
     # Stors the last x dbfs values
     last_messurment: list = [] 
     threshold = THRESHOLD
     time = SCILENCE_DETECT_TIME 
     listen = True
+    #TODO: add functionality to dect when playback is stopped manually
     while listen:
         frame = q.get()
         dbfs = calculate_dbfs(frame)
@@ -120,7 +121,7 @@ def handler(address: str, *args: list[str]):
         stream = sd.InputStream(samplerate=SAMPEL_RATE, channels=CHANNELS,
             blocksize=CHUNK, device=DEVICE, callback=callback)
         with stream:
-            detect_scilence()
+            detect_scilence(args)
     else:
         return
 
