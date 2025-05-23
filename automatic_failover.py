@@ -23,8 +23,8 @@ set DEFAULT = True
 """
 
 # Audio device config
-DEFAULT = True
-DEVICE = 3 # 3 for Focusrite
+DEFAULT: bool = True
+DEVICE: int = 3 # 3 for Focusrite
 CHUNK: int = 3200
 CHANNELS = [11, 12] # Focusrite 18i8 loopback Channels [11, 12]
 SAMPEL_RATE: int = 44100
@@ -83,7 +83,7 @@ def calculate_dbfs(data) -> float:
     return loudness_db
 
 
-def callback(indata, frames, time, status):
+def callback(indata, frames, time, status) -> None:
     """This is called (from a separate thread) for each audio block."""
     if status:
         print(status, file=sys.stderr)
@@ -94,12 +94,12 @@ def callback(indata, frames, time, status):
 def detect_scilence() -> None:
     last_messurment: list = [] 
     threshold = THRESHOLD
-    time_ = SCILENCE_DETECT_TIME 
+    time: float = SCILENCE_DETECT_TIME 
     stop_event.clear()
     while not stop_event.is_set():
         frame = q.get()
-        dbfs = calculate_dbfs(frame)
-        if len(last_messurment) < time_:
+        dbfs: float = calculate_dbfs(frame)
+        if len(last_messurment) < time:
             last_messurment.append(dbfs)
             print(dbfs)
         else:
@@ -116,7 +116,7 @@ def detect_scilence() -> None:
                 break
 
 
-def handler(address: str, *args: list[str]):
+def handler(address: str, *args: list[str]) -> None:
     """This is an example function. 
     It detects the Reaper OSC message for toggle play and starts listening. 
     This needs to be adapted for other aplications
@@ -134,7 +134,7 @@ def handler(address: str, *args: list[str]):
         start_detection()
 
 
-def start_detection():
+def start_detection() -> None:
     global detection_thread
     if detection_thread is None or not detection_thread.is_alive():
         stop_event.clear()
@@ -142,13 +142,13 @@ def start_detection():
         detection_thread.start()
 
 
-def run_detection():
+def run_detection() -> None:
     with sd.InputStream(samplerate=SAMPEL_RATE, channels=CHANNELS,
                         blocksize=CHUNK, device=DEVICE, callback=callback):
         detect_scilence()
 
 
-def osc_server_thread():
+def osc_server_thread() -> None:
     dispatcher = Dispatcher()
     dispatcher.map("/play", handler)
     # Optional: dispatcher.map("/stop", handler)
