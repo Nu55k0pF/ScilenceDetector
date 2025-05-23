@@ -16,7 +16,6 @@ ip = args.ip  # IP address of the server
 port = args.p  # Port of the server
 message = args.m  # Message to send
 value = args.v  # Value to send
-# Convert value to float if possible
 
 try:
     value = [int(v) for v in value]
