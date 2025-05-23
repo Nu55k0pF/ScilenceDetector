@@ -13,6 +13,8 @@ import sounddevice as sd
 
 CHUNK = 3200
 CHANNELS = [11,12] # Focusrite 18i8 loopback Channels 11/12
+DEVICE = 3 # 3 for Focusrite
+
 q = queue.Queue()
 
 def calculate_dbfs(data) -> float:
@@ -61,7 +63,7 @@ def detect_scilence():
 # print(sd.query_devices(20))
 
 stream = sd.InputStream(samplerate=44100, channels=CHANNELS,
-    blocksize=CHUNK, device=20, callback=callback)
+    blocksize=CHUNK, device=DEVICE, callback=callback)
 
 with stream:
     while True:
