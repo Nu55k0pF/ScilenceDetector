@@ -11,6 +11,7 @@ import threading
 import time
 
 # Set environment variable before importing sounddevice. Value is not important.
+# This is needed to enable ASIO support
 os.environ["SD_ENABLE_ASIO"] = "1"
 
 import sounddevice as sd
@@ -50,15 +51,15 @@ Don't mess with anything after the config section if you just want to use the pr
 
 # Set the default audio device and samplerate if DEFAULT is True
 def set_audio_defaults():
+    """Sets some default values for audio device configuration."""
     global DEVICE, SAMPEL_RATE, CHANNELS
-    # Hole das Standard-Input-Device
+
     default_input = sd.default.device[0]
     if default_input is None or default_input < 0:
         default_input = sd.query_devices(kind='input')['index']
+
     DEVICE = default_input
-    # Hole die Standard-Samplerate
     SAMPEL_RATE = int(sd.query_devices(DEVICE, 'input')['default_samplerate'])
-    # Hole die Standard-Anzahl der Kanäle (als Integer!)
     CHANNELS = sd.query_devices(DEVICE, 'input')['max_input_channels']
 
 if DEFAULT:
@@ -71,7 +72,7 @@ detection_thread = None  # Globaler Thread-Handle
 
 
 def send_osc_message() -> None:
-    """Use this to configure the action to take when detecitng scilence"""
+    """Creats a udp client and sends a OSC message and prints it to console."""
     osc_client = udp_client.SimpleUDPClient(address=REMOTE_OSC_IP, port=REMOTE_OSC_PORT) 
     print("Sending {} '{}' to {}:{}".format(OSC_ADRESS, OSC_VALUE, REMOTE_OSC_IP, REMOTE_OSC_PORT))
     osc_client.send_message(OSC_ADRESS, value=OSC_VALUE) # Send a OSC Message to some other hardware or module
@@ -92,6 +93,8 @@ def callback(indata, frames, time, status) -> None:
 
 
 def detect_scilence() -> None:
+    """gets audio frame data from que and calculates dbfs audio level.
+    If level is under the configured threshold, call send_osc_message"""
     last_messurment: list = [] 
     threshold = THRESHOLD
     time: float = SCILENCE_DETECT_TIME 
@@ -111,19 +114,16 @@ def detect_scilence() -> None:
                 continue
             else: 
                 print("Scilence Detected!!!!")
-                print(avarage, threshold)
                 send_osc_message()
                 break
 
 
 def handler(address: str, *args: list[str]) -> None:
-    """This is an example function. 
-    It detects the Reaper OSC message for toggle play and starts listening. 
-    This needs to be adapted for other aplications
-    map the OSC adress for the dispatcher according to your DAW or other OSC device.
-    By default this script assumes, that it gets '/play (1, 1)' as its OSC start signal 
+    """ Handles incoming OSC messages. 
+    This function is called when an OSC message is received.
+    It checks the address and arguments of the message and takes appropriate action.
 
-    addres: OSC adress like /play
+    address: OSC address like /play
     *args: OSC values 1 or 0
     """
     print("Recived {} {}".format(address, args))
@@ -135,14 +135,20 @@ def handler(address: str, *args: list[str]) -> None:
 
 
 def start_detection() -> None:
+    """Starts the silence detection thread if it is not already running.
+
+    This function checks if the global detection_thread is either None or not alive.
+    If so, it clears the stop_event and starts a new daemon thread that runs the
+    silence detection logic. This ensures that only one detection thread runs at a time.
+    """
     global detection_thread
     if detection_thread is None or not detection_thread.is_alive():
         stop_event.clear()
-        detection_thread = threading.Thread(target=run_detection, daemon=True)
+        detection_thread = threading.Thread(target=scilence_detection_thread, daemon=True)
         detection_thread.start()
 
 
-def run_detection() -> None:
+def scilence_detection_thread() -> None:
     with sd.InputStream(samplerate=SAMPEL_RATE, channels=CHANNELS,
                         blocksize=CHUNK, device=DEVICE, callback=callback):
         detect_scilence()
