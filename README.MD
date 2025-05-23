@@ -1,6 +1,10 @@
 # Automatic failover for Ableton and OSC
+
+Version 1.0
+
 ## Overview
-This project aims to develope a solution for automatic failover if playback on an Ableton live playback dops out. To achive this the OSC Server waits for a playback comand and then starts monitoring an audio impot. When scilence is detected an OSC comand is send to a mixing console or other hardware, to switch inputs to a backup system
+
+This project aims to develope a solution for automatic failover if playback on an Ableton live playback drops out. To achive this the OSC Server waits for a playback comand and then starts monitoring an audio impot. When scilence is detected an OSC comand is send to a mixing console or other hardware. This message is intend to trigger any emergency action like switching audio inputs or unmute a playback device.
 
 ## Scilence Detector
 
@@ -30,4 +34,7 @@ Configure the server to your liking and start the automatic_failover.py
 
 # To does
 
-Add a helper script to choos your audio settings
+- Add a helper script to choos your audio settings
+- Make automatic failover end gracefully 
+
+
